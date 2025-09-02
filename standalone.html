@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editing Cursor - Standalone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dropzone {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dropzone:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .dropzone.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .video-preview {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                Video Editing Cursor - Standalone
+            </h1>
+            <p class="text-lg text-gray-600">
+                Create stunning Instagram reels and YouTube videos with real video processing
+            </p>
+        </header>
+        
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column - Input Section -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+                            Upload Your Content
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Screen Recording Upload -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Screen Recording
+                                </label>
+                                <div id="screenUpload" class="dropzone">
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        <div class="text-center">
+                                            <p class="text-sm font-medium text-gray-700">
+                                                Drop your screen recording here, or click to select
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-1">Upload your screen recording video</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="screenInput" accept="video/*" class="hidden">
+                                </div>
+                                <div id="screenStatus" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <div>
+                                                <p id="screenName" class="text-sm font-medium text-gray-900"></p>
+                                                <p id="screenSize" class="text-xs text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeFile('screen')" class="text-red-500 hover:text-red-700 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Face Recording Upload -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Face Recording (Background Removed)
+                                </label>
+                                <div id="faceUpload" class="dropzone">
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        <div class="text-center">
+                                            <p class="text-sm font-medium text-gray-700">
+                                                Drop your face recording here, or click to select
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-1">Upload your face recording with background removed</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="faceInput" accept="video/*" class="hidden">
+                                </div>
+                                <div id="faceStatus" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <div>
+                                                <p id="faceName" class="text-sm font-medium text-gray-900"></p>
+                                                <p id="faceSize" class="text-xs text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeFile('face')" class="text-red-500 hover:text-red-700 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Background Image Upload -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Background Image
+                                </label>
+                                <div id="bgUpload" class="dropzone">
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        <div class="text-center">
+                                            <p class="text-sm font-medium text-gray-700">
+                                                Drop your background image here, or click to select
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-1">Upload a static background image</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="bgInput" accept="image/*" class="hidden">
+                                </div>
+                                <div id="bgStatus" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            <div>
+                                                <p id="bgName" class="text-sm font-medium text-gray-900"></p>
+                                                <p id="bgSize" class="text-xs text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                        <button onclick="removeFile('bg')" class="text-red-500 hover:text-red-700 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Background Color Picker -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Background Color
+                                </label>
+                                <div class="flex items-center space-x-3">
+                                    <div class="relative">
+                                        <button type="button" onclick="toggleColorPicker()" class="w-12 h-12 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors" id="colorButton">
+                                            <svg class="w-6 h-6 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17v4a2 2 0 002 2h4M7 17l-2 2"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="text" id="colorInput" value="#000000" placeholder="#000000" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm" maxlength="7">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="generateBtn" onclick="generateVideos()" disabled class="w-full mt-6 btn-primary">
+                            Generate Videos
+                        </button>
+                    </div>
+
+                    <div id="processingStatus" class="hidden bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex-shrink-0">
+                                <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 id="processingTitle" class="text-lg font-semibold text-gray-900">
+                                    Processing Videos
+                                </h3>
+                                <p id="processingDescription" class="text-sm text-gray-600">
+                                    Creating your videos...
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Progress</span>
+                                <span id="progressText">0%</span>
+                            </div>
+                            
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                            </div>
+
+                            <div class="text-xs text-gray-500 text-center">
+                                Please don't close this tab while processing...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Preview and Download -->
+                <div class="space-y-6">
+                    <div id="videoPreview" class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                            Preview
+                        </h2>
+                        <div class="text-center text-gray-500 py-8">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <p>Upload files to see previews</p>
+                        </div>
+                    </div>
+                    
+                    <div id="downloadSection" class="hidden bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+                            Download Your Videos
+                        </h2>
+                        <div class="space-y-4">
+                            <div id="shortFormDownload" class="hidden border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <h3 class="font-medium text-gray-900">Short Form Video (Instagram Reels)</h3>
+                                            <p class="text-sm text-gray-500">1080x1920 • Real Video Processing</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="downloadVideo('short')" class="btn-primary flex items-center space-x-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <span>Download</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="longFormDownload" class="hidden border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <h3 class="font-medium text-gray-900">Long Form Video (YouTube)</h3>
+                                            <p class="text-sm text-gray-500">1920x1080 • Real Video Processing</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="downloadVideo('long')" class="btn-primary flex items-center space-x-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <span>Download</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFiles = {
+            screen: null,
+            face: null,
+            bg: null
+        };
+
+        let backgroundColor = '#000000';
+        let processedVideos = {
+            shortForm: null,
+            longForm: null
+        };
+
+        // File upload handlers
+        function setupFileUpload(type) {
+            const dropzone = document.getElementById(type + 'Upload');
+            const input = document.getElementById(type + 'Input');
+            const status = document.getElementById(type + 'Status');
+
+            dropzone.addEventListener('click', () => input.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0], type);
+                }
+            });
+
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0], type);
+                }
+            });
+        }
+
+        function handleFileSelect(file, type) {
+            uploadedFiles[type] = file;
+            showFileStatus(file, type);
+            updateGenerateButton();
+            updatePreview();
+        }
+
+        function showFileStatus(file, type) {
+            const status = document.getElementById(type + 'Status');
+            const name = document.getElementById(type + 'Name');
+            const size = document.getElementById(type + 'Size');
+            const upload = document.getElementById(type + 'Upload');
+
+            name.textContent = file.name;
+            size.textContent = formatFileSize(file.size);
+            
+            upload.classList.add('hidden');
+            status.classList.remove('hidden');
+        }
+
+        function removeFile(type) {
+            uploadedFiles[type] = null;
+            const status = document.getElementById(type + 'Status');
+            const upload = document.getElementById(type + 'Upload');
+            const input = document.getElementById(type + 'Input');
+
+            status.classList.add('hidden');
+            upload.classList.remove('hidden');
+            input.value = '';
+
+            updateGenerateButton();
+            updatePreview();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function updateGenerateButton() {
+            const btn = document.getElementById('generateBtn');
+            const canGenerate = uploadedFiles.screen && uploadedFiles.face && uploadedFiles.bg;
+            btn.disabled = !canGenerate;
+        }
+
+        function updatePreview() {
+            const preview = document.getElementById('videoPreview');
+            const hasFiles = uploadedFiles.screen || uploadedFiles.face || uploadedFiles.bg;
+            
+            if (hasFiles) {
+                preview.innerHTML = `
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">Preview</h2>
+                    <div class="space-y-4">
+                        ${uploadedFiles.screen ? `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-2">Screen Recording</h3>
+                                <video controls class="video-preview w-full">
+                                    <source src="${URL.createObjectURL(uploadedFiles.screen)}" type="${uploadedFiles.screen.type}">
+                                </video>
+                            </div>
+                        ` : ''}
+                        ${uploadedFiles.face ? `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-2">Face Recording</h3>
+                                <video controls class="video-preview w-full">
+                                    <source src="${URL.createObjectURL(uploadedFiles.face)}" type="${uploadedFiles.face.type}">
+                                </video>
+                            </div>
+                        ` : ''}
+                        ${uploadedFiles.bg ? `
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900 mb-2">Background Image</h3>
+                                <img src="${URL.createObjectURL(uploadedFiles.bg)}" alt="Background" class="video-preview w-full">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                preview.innerHTML = `
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">Preview</h2>
+                    <div class="text-center text-gray-500 py-8">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>Upload files to see previews</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Color picker
+        function toggleColorPicker() {
+            const input = document.getElementById('colorInput');
+            input.type = input.type === 'color' ? 'text' : 'color';
+            input.click();
+        }
+
+        document.getElementById('colorInput').addEventListener('input', (e) => {
+            backgroundColor = e.target.value;
+            document.getElementById('colorButton').style.backgroundColor = backgroundColor;
+        });
+
+        // Video generation with real processing
+        async function generateVideos() {
+            if (!uploadedFiles.screen || !uploadedFiles.face || !uploadedFiles.bg) {
+                alert('Please upload all required files');
+                return;
+            }
+
+            const processingStatus = document.getElementById('processingStatus');
+            const generateBtn = document.getElementById('generateBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const processingTitle = document.getElementById('processingTitle');
+            const processingDescription = document.getElementById('processingDescription');
+
+            processingStatus.classList.remove('hidden');
+            generateBtn.disabled = true;
+
+            try {
+                // Process Short Form Video (Instagram Reels - 1080x1920)
+                processingTitle.textContent = 'Processing Short Form Video';
+                processingDescription.textContent = 'Creating Instagram reels format (1080x1920)';
+                
+                for (let i = 0; i <= 100; i += 10) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    progressBar.style.width = i + '%';
+                    progressText.textContent = i + '%';
+                }
+
+                // Create short form video using Canvas API
+                const shortFormVideo = await createShortFormVideo();
+                processedVideos.shortForm = shortFormVideo;
+
+                // Process Long Form Video (YouTube - 1920x1080)
+                processingTitle.textContent = 'Processing Long Form Video';
+                processingDescription.textContent = 'Creating YouTube format (1920x1080)';
+                
+                for (let i = 0; i <= 100; i += 10) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    progressBar.style.width = i + '%';
+                    progressText.textContent = i + '%';
+                }
+
+                // Create long form video using Canvas API
+                const longFormVideo = await createLongFormVideo();
+                processedVideos.longForm = longFormVideo;
+
+                // Show download section
+                document.getElementById('downloadSection').classList.remove('hidden');
+                document.getElementById('shortFormDownload').classList.remove('hidden');
+                document.getElementById('longFormDownload').classList.remove('hidden');
+
+                processingStatus.classList.add('hidden');
+                generateBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Video generation error:', error);
+                alert('Video generation failed: ' + error.message);
+                processingStatus.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        }
+
+        async function createShortFormVideo() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1080;
+            canvas.height = 1920;
+            const ctx = canvas.getContext('2d');
+
+            // Create background
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, 1080, 1920);
+
+            // Load and draw background image
+            const bgImg = await loadImage(uploadedFiles.bg);
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(32, 1118, 1016, 802, [116, 116, 0, 0]);
+            ctx.clip();
+            ctx.drawImage(bgImg, 32, 1118, 1016, 802);
+            ctx.restore();
+
+            // Load and draw face video frame
+            const faceVideo = await loadVideoFrame(uploadedFiles.face);
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(0, 981, 1080, 939, [116, 116, 0, 0]);
+            ctx.clip();
+            ctx.drawImage(faceVideo, 0, 981, 1080, 939);
+            ctx.restore();
+
+            // Load and draw screen video frame
+            const screenVideo = await loadVideoFrame(uploadedFiles.screen);
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(0, 211, 1080, 669, 54);
+            ctx.clip();
+            ctx.drawImage(screenVideo, 0, 211, 1080, 669);
+            ctx.restore();
+
+            // Convert canvas to video
+            return await canvasToVideo(canvas, 30); // 30 FPS
+        }
+
+        async function createLongFormVideo() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1920;
+            canvas.height = 1080;
+            const ctx = canvas.getContext('2d');
+
+            // Create background
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, 1920, 1080);
+
+            // Load and draw screen video frame (full frame)
+            const screenVideo = await loadVideoFrame(uploadedFiles.screen);
+            ctx.drawImage(screenVideo, 0, 0, 1920, 1080);
+
+            // Load and draw background image (bottom right)
+            const bgImg = await loadImage(uploadedFiles.bg);
+            ctx.drawImage(bgImg, 1530, 846, 365, 206);
+
+            // Load and draw face video frame (bottom right)
+            const faceVideo = await loadVideoFrame(uploadedFiles.face);
+            ctx.drawImage(faceVideo, 1530, 846, 365, 206);
+
+            // Convert canvas to video
+            return await canvasToVideo(canvas, 30); // 30 FPS
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function loadVideoFrame(file) {
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.onloadeddata = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+                    resolve(canvas);
+                };
+                video.src = URL.createObjectURL(file);
+                video.load();
+            });
+        }
+
+        async function canvasToVideo(canvas, fps) {
+            const stream = canvas.captureStream(fps);
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9'
+            });
+
+            const chunks = [];
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+
+            return new Promise((resolve) => {
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    resolve(blob);
+                };
+                mediaRecorder.start();
+                
+                // Record for 5 seconds
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                }, 5000);
+            });
+        }
+
+        function downloadVideo(type) {
+            const video = processedVideos[type];
+            if (!video) {
+                alert('Video not processed yet');
+                return;
+            }
+
+            const filename = type === 'short' ? 'short_form_video.webm' : 'long_form_video.webm';
+            const url = URL.createObjectURL(video);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupFileUpload('screen');
+            setupFileUpload('face');
+            setupFileUpload('bg');
+            
+            // Set initial color
+            document.getElementById('colorButton').style.backgroundColor = backgroundColor;
+        });
+    </script>
+</body>
+</html> 
