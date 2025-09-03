@@ -15,6 +15,8 @@ const VideoEditor = () => {
   const [processingStep, setProcessingStep] = useState<'short' | 'long' | null>(null);
   const [progress, setProgress] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState(0);
+  const [useGPU, setUseGPU] = useState(true); // Default to GPU if available
+  const [gpuAvailable, setGpuAvailable] = useState<boolean | null>(null);
   
   const {
     screenRecording,
@@ -48,7 +50,9 @@ const VideoEditor = () => {
       formData.append('format', 'both');
 
       // Use streaming API for live progress
-      const response = await fetch('/api/generate-stream', {
+      // Use GPU endpoint if enabled, otherwise fall back to regular endpoint
+      const endpoint = useGPU ? '/api/generate-gpu' : '/api/generate-stream';
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -75,6 +79,11 @@ const VideoEditor = () => {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6));
+              
+              // Check GPU availability from response
+              if (data.gpuAccelerated !== undefined) {
+                setGpuAvailable(data.gpuAccelerated);
+              }
               
               if (data.type === 'progress') {
                 setProgress(data.progress);
@@ -174,6 +183,37 @@ const VideoEditor = () => {
                 color={backgroundColor}
                 onChange={(color) => useVideoStore.getState().setBackgroundColor(color)}
               />
+            </div>
+
+            {/* GPU Acceleration Toggle */}
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <label className="flex items-center justify-between cursor-pointer">
+                <div>
+                  <span className="text-sm font-medium text-gray-900">
+                    GPU Acceleration
+                  </span>
+                  <span className="block text-xs text-gray-600">
+                    {gpuAvailable === false ? 'Not available on this system' : 'Use NVIDIA GPU for faster processing'}
+                  </span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={useGPU}
+                  onChange={(e) => setUseGPU(e.target.checked)}
+                  disabled={gpuAvailable === false}
+                  className="ml-3 h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+              </label>
+              {useGPU && gpuAvailable === null && (
+                <p className="mt-2 text-xs text-amber-600">
+                  GPU availability will be checked when processing starts
+                </p>
+              )}
+              {useGPU && gpuAvailable === true && (
+                <p className="mt-2 text-xs text-green-600">
+                  🚀 GPU detected! Expect 10-50x faster processing
+                </p>
+              )}
             </div>
 
             <button
